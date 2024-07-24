@@ -105,6 +105,8 @@ local default_config = {
     },
   },
   rename = {
+    pre_hook = nil,
+    post_hook = nil,
     in_select = true,
     auto_save = false,
     project_max_width = 0.5,

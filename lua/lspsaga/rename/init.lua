@@ -27,6 +27,9 @@ function rename:close_rename_win()
   api.nvim_win_set_cursor(0, { self.pos[1], self.pos[2] })
 
   api.nvim_buf_clear_namespace(0, ns, 0, -1)
+  if type(config.rename.post_hook) == 'function' then
+    config.rename.post_hook(false)
+  end
 end
 
 function rename:apply_action_keys(project)
@@ -91,6 +94,9 @@ local function parse_argument(args)
 end
 
 function rename:lsp_rename(args)
+  if type(config.rename.pre_hook) == 'function' then
+    config.rename.pre_hook()
+  end
   local cword = fn.expand('<cword>')
   self.pos = api.nvim_win_get_cursor(0)
   local mode, project = parse_argument(args)
@@ -226,6 +232,9 @@ function rename:do_rename(project)
   self.pos = nil
   api.nvim_win_set_cursor(current_win, { lnum, col + 1 })
   clean_context()
+  if type(config.rename.post_hook) == 'function' then
+    config.rename.post_hook(true)
+  end
 end
 
 return setmetatable(context, rename)
