@@ -21,12 +21,21 @@ function rename:close_rename_win()
   if api.nvim_get_mode().mode == 'i' then
     vim.cmd([[stopinsert]])
   end
+
   if self.winid and api.nvim_win_is_valid(self.winid) then
     api.nvim_win_close(self.winid, true)
   end
   api.nvim_win_set_cursor(0, { self.pos[1], self.pos[2] })
 
   api.nvim_buf_clear_namespace(0, ns, 0, -1)
+
+  if api.nvim_get_mode().mode == 'i' then
+    -- NOTE: after stopinsert, cursor moves to the left by 1
+    -- so offseting it by a right movement to fix it
+    -- My hypothesis is it's because it uses "i" instead of "a"
+    vim.api.nvim_command('normal! l')
+  end
+
   if type(config.rename.post_hook) == 'function' then
     config.rename.post_hook(false)
   end
