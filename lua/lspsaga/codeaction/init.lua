@@ -1,7 +1,6 @@
 local api, lsp = vim.api, vim.lsp
 local config = require('lspsaga').config
 local win = require('lspsaga.window')
-local preview = require('lspsaga.codeaction.preview')
 local ns = api.nvim_create_namespace('saga_action')
 local util = require('lspsaga.util')
 
@@ -224,7 +223,6 @@ function act:set_cursor(action_tuples)
     return
   end
   local tuple = action_tuples[num]
-  preview.action_preview(self.action_winid, self.bufnr, tuple)
 end
 
 local function apply_action(action, client, enriched_ctx)
@@ -341,7 +339,6 @@ function act:close_action_window()
   if self.action_winid and api.nvim_win_is_valid(self.action_winid) then
     api.nvim_win_close(self.action_winid, true)
   end
-  preview.preview_win_close()
 end
 
 function act:clean_context()
