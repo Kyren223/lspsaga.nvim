@@ -42,6 +42,7 @@ local default_config = {
     },
   },
   code_action = {
+    show_preview = true,
     num_shortcut = true,
     show_server_name = false,
     extend_gitsigns = false,
