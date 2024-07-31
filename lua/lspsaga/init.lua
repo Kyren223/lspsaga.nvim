@@ -61,6 +61,10 @@ local default_config = {
     sign_priority = 40,
     virtual_text = true,
     enable_in_insert = true,
+    ignore = {
+      clients = {},
+      ft = {},
+    },
   },
   scroll_preview = {
     scroll_down = '<C-f>',
