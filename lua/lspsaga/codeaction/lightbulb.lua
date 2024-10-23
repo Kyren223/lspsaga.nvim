@@ -52,11 +52,63 @@ local function update_lightbulb(bufnr, row)
   inrender_buf = bufnr
 end
 
+local function severity_vim_to_lsp(severity)
+  if type(severity) == 'string' then
+    severity = vim.diagnostic.severity[severity]
+  end
+  return severity
+end
+
+--- @param diagnostic vim.Diagnostic
+--- @return lsp.DiagnosticTag[]?
+local function tags_vim_to_lsp(diagnostic)
+  if not diagnostic._tags then
+    return
+  end
+
+  local tags = {} --- @type lsp.DiagnosticTag[]
+  if diagnostic._tags.unnecessary then
+    tags[#tags + 1] = vim.lsp.protocol.DiagnosticTag.Unnecessary
+  end
+  if diagnostic._tags.deprecated then
+    tags[#tags + 1] = vim.lsp.protocol.DiagnosticTag.Deprecated
+  end
+  return tags
+end
+
+local function diagnostic_vim_to_lsp(diagnostics)
+  ---@param diagnostic vim.Diagnostic
+  ---@return lsp.Diagnostic
+  return vim.tbl_map(function(diagnostic)
+    local user_data = diagnostic.user_data or {}
+    if user_data.lsp and not vim.tbl_isempty(user_data.lsp) and user_data.lsp.range then
+      return user_data.lsp
+    end
+    return {
+      range = {
+        start = {
+          line = diagnostic.lnum + 1,
+          character = diagnostic.col,
+        },
+        ['end'] = {
+          line = diagnostic.end_lnum + 1,
+          character = diagnostic.end_col,
+        },
+      },
+      severity = severity_vim_to_lsp(diagnostic.severity),
+      message = diagnostic.message,
+      source = diagnostic.source,
+      code = diagnostic.code,
+      tags = tags_vim_to_lsp(diagnostic),
+    }
+  end, diagnostics)
+end
+
 local function render(bufnr)
   local row = api.nvim_win_get_cursor(0)[1] - 1
   local params = lsp.util.make_range_params()
   params.context = {
-    diagnostics = lsp.diagnostic.get_line_diagnostics(bufnr),
+    diagnostics = diagnostic_vim_to_lsp(vim.diagnostic.get(bufnr, { lnum = row })),
   }
 
   lsp.buf_request(bufnr, 'textDocument/codeAction', params, function(_, result, _)
@@ -72,7 +124,7 @@ local function render(bufnr)
   end)
 end
 
-local timer = uv.new_timer()
+local timer = assert(uv.new_timer())
 
 local function update(buf)
   timer:stop()

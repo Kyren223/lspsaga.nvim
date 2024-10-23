@@ -4,6 +4,7 @@ saga.saga_augroup = api.nvim_create_augroup('Lspsaga', { clear = true })
 
 local default_config = {
   ui = {
+    winbar_prefix = '',
     border = 'rounded',
     devicon = true,
     foldericon = true,
@@ -15,6 +16,7 @@ local default_config = {
     kind = nil,
     button = { '', '' },
     imp_sign = '󰳛 ',
+    use_nerd = true,
   },
   hover = {
     max_width = 0.9,
@@ -83,6 +85,8 @@ local default_config = {
     sp_inexist = false,
     sp_global = false,
     ly_botright = false,
+    number = vim.o.number,
+    relativenumber = vim.o.relativenumber,
     keys = {
       shuttle = '[w',
       toggle_or_open = 'o',
@@ -98,6 +102,8 @@ local default_config = {
     width = 0.6,
     height = 0.5,
     save_pos = false,
+    number = vim.o.number,
+    relativenumber = vim.o.relativenumber,
     keys = {
       edit = '<C-o>',
       vsplit = '<C-v>',
